@@ -64,9 +64,12 @@ Saving artifacts...
 Contract Address為 ***0x9683eeb68fe0d3df151559670c83a40fbfd8472b***
 
 ## 測試智能合約
-```
 
-```
+1. smart contract 轉成java(在web3j-4.0/bin底下)
+- sh web3j truffle generate <'yourpath'>.json -p <'com.your.organisation.name'> -o <'yourpath'>
+2. 
+
+
 ## web3j 版本 4.0.1
 ```
 1.一定要安裝 web3j command line tools(詳細方法請參照官網教學)
