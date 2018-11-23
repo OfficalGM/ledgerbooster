@@ -1,36 +1,38 @@
-pragma solidity ^0.4.22;
-import './Ownable.sol';
+pragma solidity ^0.4.25;
+import "./Ownable.sol";
 contract Auth is Ownable {
-    mapping(uint256=>Tree) public tree;
-    uint256 public TreeNumber;
-    struct Tree {
+    mapping(uint256=>treeRecord) public clearanceRecords;
+    uint256 public treeNumber;
+    struct treeRecord {
         bytes32 RootHash;
     }
     function verify(bytes32 hash, uint8 v, bytes32 r, bytes32 s) public pure returns(address retAddr) {
-        retAddr= ecrecover(hash, v, r, s);
+        retAddr = ecrecover(hash, v, r, s);
         return retAddr;
     }
     function setTree(bytes32 _roothash) public onlyOwner returns(uint256)  {
-        tree[TreeNumber++]=Tree(_roothash);
-        return TreeNumber-1;
+        clearanceRecords[treeNumber++] = treeRecord(_roothash);
+        return treeNumber-1;
     }
     function sliceRootHash(uint idx,bytes32[] slice) public pure returns(bool) {
         require(slice.length > 0, "slice.length = 0");
         bytes32 temp;
-        uint index=idx;
-        bool b=false;
-        for(uint i=slice.length-1;i>1;i=i/2) {
-            index=index/2;
-            temp=keccak256(abi.encodePacked(slice[i-1],slice[i]));
-            b=compareByte(slice[index-1],temp);
+        uint index = idx;
+        bool b = false;
+        for(uint i = slice.length-1;i>1;i = i/2) {
+            index = index/2;
+            temp = keccak256(abi.encodePacked(slice[i-1],slice[i]));
+            b = compareByte(slice[index-1],temp);
         }
         return b;
     } 
-    
+    function lossFunction() public {
+
+    }
     function compareByte(bytes32 _h,bytes32 _s) internal pure returns(bool){
-        for(uint i=0;i<32;i++){
+        for(uint i = 0;i<32;i++){
             if(_s[i]!=_h[i]){
-                 return false;
+                return false;
             }
         }
         return true;
