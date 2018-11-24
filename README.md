@@ -6,7 +6,13 @@
 2. `npm install -g truffle`
 3. `npm install -g ganache-cli` (Optional)
 4. 在 `contract` 目錄下執行 `npm install`
+5. `truffle version`檢查目前版本資訊
 
+Output如下，需與下列版本或更高
+```
+Truffle v4.1.14 (core: 4.1.14)
+Solidity v0.4.24 (solc-js)
+```
 
 ## 複製設定檔
 

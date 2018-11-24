@@ -8,7 +8,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "deploy": "truffle deploy --reset --network development"
+    "deploy": "truffle.cmd deploy --reset --network development"
   },
   "keywords": [],
   "author": "",

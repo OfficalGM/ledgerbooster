@@ -1,17 +1,19 @@
-pragma solidity ^0.4.25;
+pragma solidity ^0.4.24;
 import "./Ownable.sol";
+
 contract Auth is Ownable {
+    event lostTx(bytes32 tx,address signature);
     mapping(uint256=>treeRecord) public clearanceRecords;
     uint256 public treeNumber;
     struct treeRecord {
-        bytes32 RootHash;
+        bytes32 rootHash;
     }
-    function verify(bytes32 hash, uint8 v, bytes32 r, bytes32 s) public pure returns(address retAddr) {
+    function verifySignature(bytes32 hash, uint8 v, bytes32 r, bytes32 s) public pure returns(address retAddr) {
         retAddr = ecrecover(hash, v, r, s);
         return retAddr;
     }
-    function setTree(bytes32 _roothash) public onlyOwner returns(uint256)  {
-        clearanceRecords[treeNumber++] = treeRecord(_roothash);
+    function writeClearanceRecords(bytes32 _rootHash) public onlyOwner returns(uint256)  {
+        clearanceRecords[treeNumber++] = treeRecord(_rootHash);
         return treeNumber-1;
     }
     function sliceRootHash(uint idx,bytes32[] slice) public pure returns(bool) {
@@ -26,8 +28,11 @@ contract Auth is Ownable {
         }
         return b;
     } 
-    function lossFunction() public {
-
+    function lostTransaction(bytes32 _tx,uint8 v,bytes32 r,bytes32 s) public {
+        address sender = msg.sender;
+        address signature = verifySignature(_tx,v,r,s);
+        require(sender==signature,"signature is wrong");
+        emit lostTx(_tx,signature);
     }
     function compareByte(bytes32 _h,bytes32 _s) internal pure returns(bool){
         for(uint i = 0;i<32;i++){
@@ -37,6 +42,7 @@ contract Auth is Ownable {
         }
         return true;
     }
+    
     function strConcat(string _a,string _b) internal pure returns (string) {
         bytes memory bytes_a = bytes(_a);
         bytes memory bytes_b = bytes(_b);
@@ -72,4 +78,5 @@ contract Auth is Ownable {
             result := mload(add(source, 32))
         }
     }
+  
 }
