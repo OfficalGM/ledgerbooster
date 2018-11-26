@@ -2,12 +2,19 @@ pragma solidity ^0.4.24;
 import "./Ownable.sol";
 
 contract Auth is Ownable {
-    event lostTx(bytes32 rootHash,uint currentBlock);
-
+    event lostTx(address client,uint currentBlock);
+    mapping(address=> challengedInfo) public challenge;
     mapping(uint256=>treeRecord) public clearanceRecords;
     uint256 public treeNumber;
     struct treeRecord {
         bytes32 rootHash;
+    }
+    struct challengedInfo{
+        address client;
+        bool challengedState; 
+        uint256 currentBlock;
+        bytes32[2] hash;//0:rootHash 1:Tx
+        uint256 treeNumber;
     }
     function verifySignature(bytes32 hash, uint8 v, bytes32 r, bytes32 s) public pure returns(address retAddr) {
         retAddr = ecrecover(hash, v, r, s);
@@ -40,10 +47,19 @@ contract Auth is Ownable {
             return false;
         }
         uint currentBlock=block.number;
-        emit lostTx(_rootHash,currentBlock);
+        challenge[sender]=challengedInfo(sender,true,currentBlock,[_rootHash,_tx],_treeNumber);
+        emit lostTx(sender,currentBlock);
         return true;
     }
- 
+    function spProof(address addr) public view onlyOwner{
+        //not finish;
+    }
+    function propose() public view returns(bool){
+        require(challenge[msg.sender].challengedState==true,"challengedState is wrong or adddress is wrong");
+        require(challenge[msg.sender].currentBlock<(block.number+50),"challenge is not finish");
+        return true;
+    }
+    
     function compareByte(bytes32 _h,bytes32 _s) internal pure returns(bool){
         for(uint i = 0;i<32;i++){
             if(_s[i]!=_h[i]){
