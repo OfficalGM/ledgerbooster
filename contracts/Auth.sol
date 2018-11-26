@@ -36,18 +36,19 @@ contract Auth is Ownable {
         }
         return b;
     } 
-    function lostTransaction(bytes32 _rootHash,uint _treeNumber,bytes32 _tx,uint8 v,bytes32 r,bytes32 s) public returns(bool) {
+    function lostTransaction(bytes32 _rootHash,uint _treeNumber,bytes32 pbPairs,bytes32 _tx,uint8 v,bytes32 r,bytes32 s) public returns(bool) {
         address sender = msg.sender;
         address signature = verifySignature(_tx,v,r,s);
-        if(sender!=signature){
+        if(sender!=signature)
             return false;
-        }
-        bytes32 treeHash=clearanceRecords[_treeNumber].rootHash;
-        if(_rootHash!=treeHash){
+        if(_tx==keccak256(abi.encodePacked(pbPairs)))
             return false;
-        }
-        uint currentBlock=block.number;
-        challenge[sender]=challengedInfo(sender,true,currentBlock,[_rootHash,_tx],_treeNumber);
+        bytes32 treeHash = clearanceRecords[_treeNumber].rootHash;
+        if(_rootHash!=treeHash)
+            return false;
+        
+        uint currentBlock = block.number;
+        challenge[sender] = challengedInfo(sender,true,currentBlock,[_rootHash,_tx],_treeNumber);
         emit lostTx(sender,currentBlock);
         return true;
     }
