@@ -8,7 +8,6 @@ contract LedgerBooster is Ownable {
     mapping(uint256=> Utils.treeRecord) public clearanceRecords;
     uint256 public treeNumber;
    
-    
     function writeClearanceRecords(bytes32 _rootHash) public onlyOwner returns(uint256)  {
         clearanceRecords[treeNumber++] = Utils.treeRecord(_rootHash);
         return treeNumber-1;
