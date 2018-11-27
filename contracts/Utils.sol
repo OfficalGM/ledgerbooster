@@ -1,14 +1,6 @@
 pragma solidity ^0.4.24;
-import "./Ownable.sol";
 
-contract Auth is Ownable {
-    event lostTx(address client,uint currentBlock);
-    mapping(address=> challengedInfo) public challenge;
-    mapping(uint256=>treeRecord) public clearanceRecords;
-    uint256 public treeNumber;
-    struct treeRecord {
-        bytes32 rootHash;
-    }
+library Utils{
     struct challengedInfo{
         address client;
         bool challengedState; 
@@ -16,13 +8,12 @@ contract Auth is Ownable {
         bytes32[2] hash;//0:rootHash 1:Tx
         uint256 treeNumber;
     }
+    struct treeRecord {
+        bytes32 rootHash;
+    }
     function verifySignature(bytes32 hash, uint8 v, bytes32 r, bytes32 s) public pure returns(address retAddr) {
         retAddr = ecrecover(hash, v, r, s);
         return retAddr;
-    }
-    function writeClearanceRecords(bytes32 _rootHash) public onlyOwner returns(uint256)  {
-        clearanceRecords[treeNumber++] = treeRecord(_rootHash);
-        return treeNumber-1;
     }
     function sliceRootHash(uint idx,bytes32[] slice) public pure returns(bool) {
         require(slice.length > 0, "slice.length = 0");
@@ -36,29 +27,6 @@ contract Auth is Ownable {
         }
         return b;
     } 
-    function lostTransaction(bytes32 _rootHash,uint _treeNumber,bytes32 pbPairs,bytes32 _tx,uint8 v,bytes32 r,bytes32 s) public returns(bool) {
-        address sender = msg.sender;
-        address signature = verifySignature(_tx,v,r,s);
-        if(sender!=signature)
-            return false;
-        if(_tx!=keccak256(abi.encodePacked(pbPairs)))
-            return false;
-        if(_rootHash!=clearanceRecords[_treeNumber].rootHash)
-            return false;
-        uint currentBlock = block.number;
-        challenge[sender] = challengedInfo(sender,true,currentBlock,[_rootHash,_tx],_treeNumber);
-        emit lostTx(sender,currentBlock);
-        return true;
-    }
-    function spProof(address addr) public view onlyOwner{
-        //not finish;
-    }
-    function propose() public view returns(bool){
-        require(challenge[msg.sender].challengedState==true,"challengedState is wrong or adddress is wrong");
-        require(challenge[msg.sender].currentBlock<(block.number+50),"challenge is not finish");
-        return true;
-    }
-    
     function compareByte(bytes32 _h,bytes32 _s) internal pure returns(bool){
         for(uint i = 0;i<32;i++){
             if(_s[i]!=_h[i]){
@@ -102,5 +70,4 @@ contract Auth is Ownable {
             result := mload(add(source, 32))
         }
     }
-  
 }
