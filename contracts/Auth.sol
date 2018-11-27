@@ -41,12 +41,10 @@ contract Auth is Ownable {
         address signature = verifySignature(_tx,v,r,s);
         if(sender!=signature)
             return false;
-        if(_tx==keccak256(abi.encodePacked(pbPairs)))
+        if(_tx!=keccak256(abi.encodePacked(pbPairs)))
             return false;
-        bytes32 treeHash = clearanceRecords[_treeNumber].rootHash;
-        if(_rootHash!=treeHash)
+        if(_rootHash!=clearanceRecords[_treeNumber].rootHash)
             return false;
-        
         uint currentBlock = block.number;
         challenge[sender] = challengedInfo(sender,true,currentBlock,[_rootHash,_tx],_treeNumber);
         emit lostTx(sender,currentBlock);
