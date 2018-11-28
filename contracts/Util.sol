@@ -1,6 +1,6 @@
 pragma solidity ^0.4.24;
 
-library Utils{
+library Util{
     struct challengedInfo{
         address client;
         bool challengedState; 
@@ -10,6 +10,8 @@ library Utils{
     }
     struct treeRecord {
         bytes32 rootHash;
+        uint256 treeNumber;
+        uint256 classification;
     }
     function verifySignature(bytes32 hash, uint8 v, bytes32 r, bytes32 s) public pure returns(address retAddr) {
         retAddr = ecrecover(hash, v, r, s);

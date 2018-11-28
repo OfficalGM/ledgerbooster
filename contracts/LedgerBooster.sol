@@ -1,31 +1,28 @@
 pragma solidity ^0.4.24;
+
 import "./Ownable.sol";
-import "./Utils.sol";
+import "./Util.sol";
 
 contract LedgerBooster is Ownable {
     event lostTx(address client,uint currentBlock);
-    mapping(address=> Utils.challengedInfo) public challengeLog;
-    mapping(uint256=> Utils.treeRecord) public clearanceRecords;
+    mapping(address=> Util.challengedInfo) public challengeLog;
+    mapping(uint256=> Util.treeRecord) public clearanceRecords;
     uint256 public treeNumber;
    
-    function writeClearanceRecords(bytes32 _rootHash) public onlyOwner returns(uint256)  {
-        clearanceRecords[treeNumber++] = Utils.treeRecord(_rootHash);
-        return treeNumber-1;
+    function writeClearanceRecords(bytes32 _rootHash,uint256 classification) public onlyOwner   {
+        clearanceRecords[treeNumber++] = Util.treeRecord(_rootHash,treeNumber,classification);
     }
     
-    function lostTransaction(bytes32 _rootHash,uint _treeNumber,bytes32 pbPairs,bytes32 _tx,uint8 v,bytes32 r,bytes32 s) public returns(bool) {
+    function lostTransaction(bytes32 _rootHash,uint _treeNumber,bytes32 pbPairs,bytes32 _tx,uint8 v,bytes32 r,bytes32 s) public{
         address sender = msg.sender;
-        address signature = Utils.verifySignature(_tx,v,r,s);
-        if(sender!=signature)
-            return false;
-        if(_tx!=keccak256(abi.encodePacked(pbPairs)))
-            return false;
-        if(_rootHash!=clearanceRecords[_treeNumber].rootHash)
-            return false;
+        address signature = Util.verifySignature(_tx,v,r,s);
+        require(sender!=signature,"signature is error");
+        require(_tx!=keccak256(abi.encodePacked(pbPairs)),"tx is wrong");
+        require(_rootHash!=clearanceRecords[_treeNumber].rootHash,"roothash is error");
         uint currentBlock = block.number;
-        challengeLog[sender] = Utils.challengedInfo(sender,true,currentBlock,[_rootHash,_tx],_treeNumber);
+        challengeLog[sender] = Util.challengedInfo(sender,true,currentBlock,[_rootHash,_tx],_treeNumber);
         emit lostTx(sender,currentBlock);
-        return true;
+        
     }
     function spProof(address addr) public view onlyOwner{
         //not finish;
