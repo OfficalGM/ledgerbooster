@@ -82,5 +82,35 @@ Contract Address為 ***0x9683eeb68fe0d3df151559670c83a40fbfd8472b***
 2.web3j.sh 為Mac版本的shell
 ```
 
-
+# Sha3測試
+### Sha3 String Test
+1.  Input
+`"<string>"` `ex:AA`
+2.  Output
+```
+> Hash.sha3(<string>) == keccak256(abi.encodePacked(<string>))
+> true
+```
+3.  Input
+    `"<string1>,<string2>"` `ex:"AA","BB"`
+4.  Output
+  ```
+> Hash.sha3(<string1><string2>) == keccak256(abi.encodePacked(<string1>,<string2>))
+> true
+```
+### Sha3 Bytes Test
+1.  Input
+`"<byte[]>"` `ex:[-95, -22, 97, -101, 85, -116, 92, -72, 74, 122, 9, 119, -69, 64, 48, -69, -112, 33, 20, 69, 11, 79, -50, 127, -30, -45, -66, 109, -66, 72, 31, 14]`
+2.  Output
+```
+> Hash.sha3(<byte[]>) == keccak256(abi.encodePacked(<bytes[]>))
+> true
+```
+3.  Input
+    `"<byte[]>,<byte[]>"`  `ex:[-95, -22, 97, -101, 85, -116, 92, -72, 74, 122, 9, 119, -69, 64, 48, -69, -112, 33, 20, 69, 11, 79, -50, 127, -30, -45, -66, 109, -66, 72, 31, 14],[-95, -22, 97, -101, 85, -116, 92, -72, 74, 122, 9, 119, -69, 64, 48, -69, -112, 33, 20, 69, 11, 79, -50, 127, -30, -45, -66, 109, -66, 72, 31, 14]`
+4.  Output
+  ```
+> Hash.sha3(<byte[]><byte[]>) == keccak256(abi.encodePacked(<byte[]>,<byte[]>))
+> false
+```
 

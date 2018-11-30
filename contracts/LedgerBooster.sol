@@ -24,7 +24,7 @@ contract LedgerBooster is Ownable {
         emit lostTx(sender,currentBlock);
         
     }
-    function spProof(address addr) public view onlyOwner{
+    function spProof(address addr) public view onlyOwner{ 
         //not finish;
     }
     function propose() public view returns(bool){

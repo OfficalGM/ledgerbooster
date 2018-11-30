@@ -1,6 +1,6 @@
 pragma solidity ^0.4.24;
 
-library Util{
+library Utils{
     struct challengedInfo{
         address client;
         bool challengedState; 
@@ -17,7 +17,7 @@ library Util{
         retAddr = ecrecover(hash, v, r, s);
         return retAddr;
     }
-    function sliceRootHash(uint idx,bytes32[] slice) public pure returns(bool) {
+    function calculateRootHash(uint idx,bytes32[] slice) public pure returns(bool) {
         require(slice.length > 0, "slice.length = 0");
         bytes32 temp;
         uint index = idx;
@@ -70,6 +70,20 @@ library Util{
         }
         assembly {
             result := mload(add(source, 32))
+        }
+    }
+    function mergeBytes(bytes memory a, bytes memory b) internal pure returns (bytes memory c) {
+        uint alen = a.length;
+        uint totallen = alen + b.length;
+        uint loopsa = (a.length + 31) / 32;
+        uint loopsb = (b.length + 31) / 32;
+        assembly {
+            let m := mload(0x40)
+            mstore(m, totallen)
+            for {  let i := 0 } lt(i, loopsa) { i := add(1, i) } { mstore(add(m, mul(32, add(1, i))), mload(add(a, mul(32, add(1, i))))) }
+            for {  let i := 0 } lt(i, loopsb) { i := add(1, i) } { mstore(add(m, add(mul(32, add(1, i)), alen)), mload(add(b, mul(32, add(1, i))))) }
+            mstore(0x40, add(m, add(32, totallen)))
+            c := m
         }
     }
 }
